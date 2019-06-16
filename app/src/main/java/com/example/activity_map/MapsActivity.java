@@ -443,7 +443,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 bw.newLine();
                 bw.flush();
                 Toast.makeText(this, "home保存ok", Toast.LENGTH_SHORT).show();
-                //保存成功提示
+                //保存成功を表示
             } catch (Exception e) {
                 //失敗
                 e.printStackTrace();
