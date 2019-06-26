@@ -22,7 +22,8 @@ import android.Manifest;
         import android.view.View;
         import android.widget.Button;
         import android.widget.ListView;
-        import android.widget.TextView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
         import android.widget.Toast;
 
         import com.google.android.gms.common.ConnectionResult;
@@ -43,11 +44,19 @@ import android.Manifest;
         import java.io.BufferedWriter;
         import java.io.File;
         import java.io.FileOutputStream;
-        import java.io.OutputStreamWriter;
-        import java.text.SimpleDateFormat;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
         import java.util.Date;
         import java.util.Locale;
         import io.realm.Realm;
+        import org.json.JSONArray;
+        import org.json.JSONException;
+        import org.json.JSONObject;
+        import java.text.DateFormat;
+
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
@@ -67,6 +76,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public double Hlng;
     private TextView locationTextView;
     private TextView locationDetailTextView;
+    private TextView  detailsField;
+    private TextView currentTemperatureField;
+    private TextView temp;
+    private ProgressBar loader;
     public String locationname;
     private LocationManager locationManager;
     private Location location = null;
@@ -76,8 +89,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String filePath = "/testfileAct.txt";//csv
     private String filePath_h = "/h.txt";//csv
 
+
     private String TAG = MainActivity.class.getSimpleName();//db
     BroadcastReceiver broadcastReceiver;
+    String city = "Tokyo, JP";
+
+    String OPEN_WEATHER_MAP_API = "6fed7f8a8b65d9b677317a8833be2d0c";
 
 
     private OnLocationChangedListener onLocationChangedListener = null;
@@ -171,6 +188,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationTextView = (TextView) findViewById(R.id.locationTextView);
         locationDetailTextView = (TextView) findViewById(R.id.locationDetailTextView);//場所表示
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        detailsField = (TextView) findViewById(R.id.details_field);
+        currentTemperatureField = (TextView) findViewById(R.id.current_temperature_field);
 
     }
 
@@ -217,7 +236,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (confidence > Constants.CONFIDENCE) {
             txtActivity = label;
             txtConfidence = "" + confidence;
-
         }
     }
 
@@ -303,6 +321,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             locationname = locationDetailTextView.getText().toString();//
             if (locationname.equals(home) == true) locationname = "home";
             String url = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%.4f,%.4f&sensor=false", location.getLatitude(), location.getLongitude());
+
+
             Log.d(TAG, "doInBackground: url :" + url);
             //Toast.makeText(this, locationname, Toast.LENGTH_LONG).show();
             //geo
@@ -332,6 +352,64 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Toast.makeText(this, "追加した", Toast.LENGTH_SHORT).show();
         }
     }
+
+    public void taskLoadUp(String query) {
+        if (Function.isNetworkAvailable(getApplicationContext())) {
+            DownloadWeather task = new DownloadWeather();
+            task.execute(query);
+        } else {
+            Toast.makeText(getApplicationContext(), "No Internet Connection", Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+    class DownloadWeather extends AsyncTask < String, Void, String > {//天気未実装　
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        protected String doInBackground(String... args) {
+            String xml = Function.excuteGet("http://api.openweathermap.org/data/2.5/weather?q=" +args[0] +
+                    "&units=metric&appid=" + OPEN_WEATHER_MAP_API);
+            return xml;
+        }
+
+        @Override
+        protected void onPostExecute(String xml) {
+
+            try {
+                JSONObject json = new JSONObject(xml);
+                if (json != null) {
+                    JSONObject details = json.getJSONArray("weather").getJSONObject(0);
+                    JSONObject main = json.getJSONObject("main");
+                    DateFormat df = DateFormat.getDateTimeInstance();
+                    String finalCoordinator = location.getLatitude() + " " + location.getLongitude();
+                    currentTemperatureField.clearComposingText();
+                    currentTemperatureField.append("\n " + finalCoordinator);
+                    Geocoder geocoder = new Geocoder(MapsActivity.this, Locale.getDefault());
+                    detailsField.setText(details.getString("description").toUpperCase(Locale.JAPAN));//天気の詳細
+                    currentTemperatureField.setText(String.format("%.2f", main.getDouble("temp")) + "°");//気温
+                    //currentTemperatureField.setText(GeoCoding.reverseGeoCoding(geocoder, location.getLatitude(), location.getLongitude()));
+                    locationname = currentTemperatureField.getText().toString();//
+
+                    //loader.setVisibility(View.GONE);
+
+                }
+            } catch (JSONException e) {
+                Toast.makeText(getApplicationContext(), "Error, Check City", Toast.LENGTH_SHORT).show();
+            }
+
+
+        }
+
+    }
+
+
+
+
     @Override
     public void onConnected(Bundle bundle) {
         // check permission
@@ -398,7 +476,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d(TAG, "doInBackground: url :" + url);
             return null;
         }
+
+
+
+        protected String doInBackground(String...args) {
+            String xml = Function.excuteGet("http://api.openweathermap.org/data/2.5/weather?q=" + args[0] +
+                    "&units=metric&appid=" + OPEN_WEATHER_MAP_API);
+            return null;
+        }
+
+
     }
+
+
     //ひきだし
     private void setUpReadWriteExternalStorage () {
         if (isExternalStorageWritable()) {
