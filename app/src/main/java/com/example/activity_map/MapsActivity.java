@@ -90,10 +90,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         filePath = Environment.getExternalStorageDirectory().getPath() + filePath;
         filePath_h = Environment.getExternalStorageDirectory().getPath() + filePath_h;
         if (Build.VERSION.SDK_INT >= 23) {
-            checkPermission();
+            checkPermission(); //ストレージへのアクセス許可を得る
         } else {
             setUpReadWriteExternalStorage();
         }

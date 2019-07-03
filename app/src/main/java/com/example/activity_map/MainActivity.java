@@ -16,12 +16,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) { //ここからスタート
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        if (Build.VERSION.SDK_INT >= 23) {
+        if (Build.VERSION.SDK_INT >= 23) { //SDKのバージョンが23以上ならば
             checkPermission();
         } else {
             locationActivity();
@@ -33,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     public void checkPermission() {
         // 許可
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationActivity();
+            locationActivity(); //位置情報アクセスの許可が得られればlocationActivityへ
         }
         // no
         else {
@@ -78,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     private void locationActivity() {
         //許可あればマップの画面に開く
         Intent intent = new Intent(getApplication(), MapsActivity.class);
-        startActivity(intent);
+        startActivity(intent); //MapsActivityへ移動
     }
 
 
