@@ -6,6 +6,7 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 public class Schedule extends RealmObject {
+    //保存するための関数作成
     @PrimaryKey
     private long id;
     private String activity1;
@@ -13,6 +14,7 @@ public class Schedule extends RealmObject {
     private double latitude;
     private double longitude;
     private String locationname;
+    //private String weather;
     public String getActivity1() {
         return activity1;
     }
@@ -59,6 +61,8 @@ public class Schedule extends RealmObject {
     public void setLocationname(String locationname) {
         this.locationname = locationname;
     }
+
+    //public void setWeather(String weather){return weather;}
 
 
 }
