@@ -2,15 +2,27 @@ package com.example.activity_map;
 
 import android.app.Activity;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
+import io.realm.Realm;
 
 /**
  * 非同期処理を行うクラス.
@@ -18,6 +30,7 @@ import java.net.URL;
 public final class AsyncHttpRequest extends AsyncTask<URL, Void, String> {
     private int TODAY_FORCAST_INDEX = 0;
     private Activity mainActivity;
+    public String wea;
 
     public AsyncHttpRequest(Activity activity) {
         // 呼び出し元のアクティビティ
@@ -71,6 +84,7 @@ public final class AsyncHttpRequest extends AsyncTask<URL, Void, String> {
             JSONObject jsonObject = new JSONObject(response.toString());
             JSONObject details = jsonObject.getJSONArray("weather").getJSONObject(TODAY_FORCAST_INDEX);
             JSONObject todayForcasts = jsonObject.getJSONObject("main");//getJCONArrayにしていたため動かなかった。型があったため動いた
+            double kion = todayForcasts.getDouble("temp");
             String tenkou = details.getString("main");
             if (tenkou.equals("Rain")) {
                 tenkou = "雨";
@@ -81,9 +95,10 @@ public final class AsyncHttpRequest extends AsyncTask<URL, Void, String> {
             } else if (tenkou.equals("Snow")){
                 tenkou = "雪";
             }
+            String wea = kion +"° " +  tenkou;
 
 
-            return "気温:" + todayForcasts.getDouble("temp") +"°\n天気:" +  tenkou ;
+            return wea ;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -103,7 +118,8 @@ public final class AsyncHttpRequest extends AsyncTask<URL, Void, String> {
      */
     @Override
     protected void onPostExecute(String result) {
-        TextView tv = mainActivity.findViewById(R.id.weather);
+        TextView tv = mainActivity.findViewById(R.id.locationWeather);
         tv.setText(result);
     }
+
 }

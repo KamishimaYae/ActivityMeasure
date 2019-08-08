@@ -71,11 +71,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public double Hlng;
     private TextView locationTextView;
     private TextView locationDetailTextView;
-    private TextView  detailsField;
+    private TextView locationWeather;
     private TextView currentTemperatureField;
     private TextView temp;
     private ProgressBar loader;
     public String locationname;
+    public String weather;
     private LocationManager locationManager;
     private Location location = null;
     private Geocoder geocoder;//4GEO
@@ -172,18 +173,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         };
         startTracking();
-        activityedit = findViewById(R.id.EditButton);//活動記録ボタン
-        activityedit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MapsActivity.this, ScheduleActivity.class));
-            }
-        });
-        mRealm = Realm.getDefaultInstance();//データ保存
         locationTextView = (TextView) findViewById(R.id.locationTextView);
         locationDetailTextView = (TextView) findViewById(R.id.locationDetailTextView);//場所表示
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        currentTemperatureField = (TextView) findViewById(R.id.weather);
+        locationWeather = (TextView) findViewById(R.id.locationWeather);
 
     }
 
@@ -313,12 +306,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Geocoder geocoder = new Geocoder(MapsActivity.this, Locale.getDefault());
             locationDetailTextView.setText(GeoCoding.reverseGeoCoding(geocoder, location.getLatitude(), location.getLongitude()));//geo重要
             locationname = locationDetailTextView.getText().toString();//
+            locationWeather.clearComposingText();
             try {
                 new AsyncHttpRequest(this).execute(new URL("https://api.openweathermap.org/data/2.5/weather?lat="+
                         location.getLatitude()+"&lon="+location.getLongitude()+"&units=metric&appid=6fed7f8a8b65d9b677317a8833be2d0c"));
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
+            weather = locationWeather.getText().toString();
 
             if (locationname.equals(home) == true) locationname = "home";
             String url = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%.4f,%.4f&sensor=false", location.getLatitude(), location.getLongitude());
@@ -327,27 +322,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Toast.makeText(this, locationname, Toast.LENGTH_LONG).show();
             //geo
 
-            mRealm.executeTransaction(new Realm.Transaction() {
-                //SimpleDateFormat sdf=new SimpleDateFormat("HH:mm:ss EEE/dd/MM");
-                Date date = new Date(System.currentTimeMillis());//
-
-                // final Date date = sdf.format(dateParse);
-
-
-                public void execute(Realm realm) {
-                    //　ここで日付、状態、場所を保存する
-                    Number maxId = realm.where(Schedule.class).max("id");
-                    long nextId = 0;
-                    if (maxId != null) nextId = maxId.longValue() + 1;
-                    Schedule schedule = realm.createObject(Schedule.class, new Long(nextId));
-                    schedule.setDate(date);
-                    schedule.setActivity1(txtActivity);
-                    // schedule.setLatitude(lat);
-                    //schedule.setLongitude(lng);
-                    schedule.setLocationname(locationname);
-                    //schedule.setWeather();
-                }
-            });
             setUpReadWriteExternalStorage();//csv
             // setUpReadWriteExternalStorage_home();
             Toast.makeText(this, "追加した", Toast.LENGTH_SHORT).show();
@@ -437,6 +411,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             double slat =lat;
             double slng=lng;
             //String sloc = locationname;//位置情報
+            String swea = weather;
             Date dateParse = new Date(System.currentTimeMillis());
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             final String sdate= sdf.format(dateParse);
@@ -448,7 +423,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                  BufferedWriter bw =
                          new BufferedWriter(outputStreamWriter);
             ) {
-                bw.write(sdate+","+slat+","+slng+","+sact+",");//書き込み
+                bw.write(sdate+","+slat+","+slng+","+sact+","+swea+",");//書き込み
+                //bw.write(sdate+","+slat+","+slng+","+sact+",");
                 // bw.write(Hlat+","+Hlng);
                 bw.newLine();
                 bw.flush();

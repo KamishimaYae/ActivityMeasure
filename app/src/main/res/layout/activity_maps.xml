@@ -61,21 +61,14 @@
         android:layout_width="395dp"
         android:layout_height="416dp" />
 
-    <Button
-    android:id="@+id/EditButton"
-    android:layout_width="wrap_content"
-    android:layout_height="40dp"
-    android:layout_weight="1"
-    android:text="活動記録" />
-
     <TextView
-        android:id="@+id/weather"
+        android:id="@+id/locationWeather"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="TextView"/>
+        android:text="TextView"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 
 
