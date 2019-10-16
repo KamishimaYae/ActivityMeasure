@@ -52,7 +52,6 @@ import java.text.SimpleDateFormat;
         import java.util.Locale;
         import io.realm.Realm;
 
-
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         LocationListener, GoogleMap.OnMyLocationButtonClickListener, LocationSource {
@@ -61,10 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest locationRequest;
     public String txtActivity, txtConfidence;
-    public Button btnStartTracking, btnStopTracking;//ボタン
-    public Button activityedit;
-    public Realm mRealm;
-    private ListView mListView;
+    public Button btnStartTracking, btnStopTracking, Weight;//ボタン
     public  double lat;
     public  double lng;
     public double Hlat;
@@ -74,7 +70,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView locationWeather;
     private TextView currentTemperatureField;
     private TextView temp;
-    private ProgressBar loader;
     public String locationname;
     public String weather;
     private LocationManager locationManager;
@@ -88,7 +83,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private String TAG = MainActivity.class.getSimpleName();//db
     BroadcastReceiver broadcastReceiver;
-    String city = "Tokyo, JP";
 
     String OPEN_WEATHER_MAP_API = "6fed7f8a8b65d9b677317a8833be2d0c";
 
@@ -145,6 +139,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //AR
         btnStartTracking = findViewById(R.id.btn_start_tracking);//開始ボタン
         btnStopTracking = findViewById(R.id.btn_stop_tracking);//終了ボタン
+        Weight = findViewById(R.id.weight);//終了ボタン
 
         btnStartTracking.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,53 +167,85 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         };
+
         startTracking();
         locationTextView = (TextView) findViewById(R.id.locationTextView);
         locationDetailTextView = (TextView) findViewById(R.id.locationDetailTextView);//場所表示
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationWeather = (TextView) findViewById(R.id.locationWeather);
 
+        Button WeightButton = findViewById(R.id.weight);
+        WeightButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplication(), WeightActivity.class);
+                startActivity(intent);
+            }
+
+        });
     }
+
+    int vehiclecount = 0;
+    int bicyclecount = 0;
+    int walkingcount = 0;
+    int runningcount = 0;
+    int stillcount = 0;
+    int unknowncount = 0;
+
 
 
     private void handleUserActivity(int type, int confidence) {
         // 状態表示
+
         String label = getString(R.string.activity_unknown);
         switch (type) {
             case DetectedActivity.IN_VEHICLE: {
                 label = getString(R.string.activity_in_vehicle);
+                vehiclecount += 1;
                 break;
             }
             case DetectedActivity.ON_BICYCLE: {
                 label = getString(R.string.activity_on_bicycle);
+                bicyclecount += 1;
                 break;
             }
             case DetectedActivity.ON_FOOT: {
                 label = getString(R.string.activity_walking);
+                walkingcount += 1;
                 break;
             }
             case DetectedActivity.RUNNING: {
                 label = getString(R.string.activity_running);
+                runningcount += 1;
                 break;
             }
             case DetectedActivity.STILL: {
                 label = getString(R.string.activity_still);
+                stillcount += 1;
                 break;
             }
-            case DetectedActivity.TILTING: {
+            /*case DetectedActivity.TILTING: {
                 label = getString(R.string.activity_tilting);
                 break;
-            }
+            }*/
             case DetectedActivity.WALKING: {
                 label = getString(R.string.activity_walking);
+                walkingcount += 1;
                 break;
             }
             case DetectedActivity.UNKNOWN: {
                 label = getString(R.string.activity_unknown);
+                unknowncount += 1;
                 break;
             }
         }
         Log.d(TAG, "User activity: " + label + ", Confidence: " + confidence);//LogCatに表示
+        System.out.println("********unknown=" + unknowncount);
+        System.out.println("********vehicle=" + vehiclecount);
+        System.out.println("********bicycle=" + bicyclecount);
+        System.out.println("********walking=" + walkingcount);
+        System.out.println("********running=" + runningcount);
+        System.out.println("********still=" + stillcount);
 
         if (confidence > Constants.CONFIDENCE) {
             txtActivity = label;
@@ -273,6 +300,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    int count = 0;
+
 
     public void onLocationChanged(Location location) {
 
@@ -287,9 +316,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 setUpReadWriteExternalStorage_home();//csv
             }
         });
+
         if (onLocationChangedListener != null) {
 
             onLocationChangedListener.onLocationChanged(location);
+
 
             lat = location.getLatitude();
             lng = location.getLongitude();
@@ -318,7 +349,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (locationname.equals(home) == true) locationname = "home";
             String url = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%.4f,%.4f&sensor=false", location.getLatitude(), location.getLongitude());
 
+            count += 1;
             Log.d(TAG, "doInBackground: url :" + url);
+            Log.d(TAG, "count =" + count);
+
             //Toast.makeText(this, locationname, Toast.LENGTH_LONG).show();
             //geo
 
@@ -423,7 +457,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                  BufferedWriter bw =
                          new BufferedWriter(outputStreamWriter);
             ) {
-                bw.write(sdate+","+slat+","+slng+","+sact+","+swea+",");//書き込み
+                bw.write(sdate+","+slat+","+slng+","+sact+","+swea+","+stillcount+","+walkingcount+","+runningcount+","+bicyclecount+","+vehiclecount+","+unknowncount+",");//書き込み
                 //bw.write(sdate+","+slat+","+slng+","+sact+",");
                 // bw.write(Hlat+","+Hlng);
                 bw.newLine();
