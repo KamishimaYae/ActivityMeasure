@@ -60,7 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest locationRequest;
     public String txtActivity, txtConfidence;
-    public Button btnStartTracking, btnStopTracking, Weight;//ボタン
+    public Button btnStartTracking, btnStopTracking, btnWeight;//ボタン
     public  double lat;
     public  double lng;
     public double Hlat;
@@ -139,7 +139,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //AR
         btnStartTracking = findViewById(R.id.btn_start_tracking);//開始ボタン
         btnStopTracking = findViewById(R.id.btn_stop_tracking);//終了ボタン
-        Weight = findViewById(R.id.weight);//終了ボタン
+        btnWeight = findViewById(R.id.weight);
 
         btnStartTracking.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,6 +152,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 stopTracking();
+            }
+        });
+
+        btnWeight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                weight();
             }
         });
 
@@ -174,15 +181,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationWeather = (TextView) findViewById(R.id.locationWeather);
 
-        Button WeightButton = findViewById(R.id.weight);
-        WeightButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplication(), WeightActivity.class);
-                startActivity(intent);
-            }
-
-        });
     }
 
     int vehiclecount = 0;
@@ -271,6 +269,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         stopService(intent);
     }
 
+    private void weight() {
+        Intent intent = new Intent(getApplication(), WeightActivity.class);
+        intent.putExtra("Vehicle", vehiclecount);
+        intent.putExtra("Bicycle", bicyclecount);
+        intent.putExtra("Walking", walkingcount);
+        intent.putExtra("Running", runningcount);
+        intent.putExtra("Stiil", stillcount);
+        intent.putExtra("Unknown", unknowncount);
+
+        startActivity(intent);
+    }
+
+
 
     @Override
     public void onPause() {
@@ -349,9 +360,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (locationname.equals(home) == true) locationname = "home";
             String url = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%.4f,%.4f&sensor=false", location.getLatitude(), location.getLongitude());
 
-            count += 1;
             Log.d(TAG, "doInBackground: url :" + url);
-            Log.d(TAG, "count =" + count);
+
 
             //Toast.makeText(this, locationname, Toast.LENGTH_LONG).show();
             //geo
@@ -430,10 +440,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d(TAG, "doInBackground: url :" + url);
             return null;
         }
-
-
-
-
 
     }
 
