@@ -44,7 +44,7 @@
             android:name=".DetectedActivitiesIntentService"
             android:exported="false" />
         <service android:name=".BackgroundDetectedActivitiesService" />
-        <service android:name=".MyService" />
+        <service android:name=".MyIntentService" />
     </application>
 
 </manifest>

@@ -34,10 +34,11 @@ public class DetectedActivitiesIntentService  extends IntentService {
         // 0 and 100.
         ArrayList<DetectedActivity> detectedActivities = (ArrayList) result.getProbableActivities();
 
-        for (DetectedActivity activity : detectedActivities) {
-            Log.e(TAG, "Detected activity: " + activity.getType() + ", " + activity.getConfidence());
-            broadcastActivity(activity);
-        }
+                for (DetectedActivity activity : detectedActivities) {
+                    Log.e(TAG, "Detected activity: " + activity.getType() + ", " + activity.getConfidence());
+                    broadcastActivity(activity);
+                    //Thread.sleep(60000);
+                }
     }
 
     private void broadcastActivity(DetectedActivity activity) {

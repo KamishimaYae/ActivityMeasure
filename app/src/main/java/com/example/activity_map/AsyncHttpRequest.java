@@ -86,6 +86,7 @@ public final class AsyncHttpRequest extends AsyncTask<URL, Void, String> {
             JSONObject todayForcasts = jsonObject.getJSONObject("main");//getJCONArrayにしていたため動かなかった。型があったため動いた
             double kion = todayForcasts.getDouble("temp");
             String tenkou = details.getString("main");
+            /*
             if (tenkou.equals("Rain")) {
                 tenkou = "雨";
             } else if (tenkou.equals("Clear")) {
@@ -95,7 +96,9 @@ public final class AsyncHttpRequest extends AsyncTask<URL, Void, String> {
             } else if (tenkou.equals("Snow")){
                 tenkou = "雪";
             }
-            String wea = kion +"° " +  tenkou;
+
+             */
+            String wea = kion +"," +  tenkou;
 
 
             return wea ;

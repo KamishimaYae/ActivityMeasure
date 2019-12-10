@@ -42,7 +42,7 @@
             android:layout_width="109dp"
             android:layout_height="40dp"
             android:layout_weight="1"
-            android:text="体重入力" />
+            android:text="運動量計測" />
 
 
     </LinearLayout>
@@ -69,6 +69,14 @@
 
     <TextView
         android:id="@+id/locationWeather"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/activityText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

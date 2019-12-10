@@ -39,7 +39,9 @@ public class BackgroundDetectedActivitiesService extends Service {
         super.onCreate();
         mActivityRecognitionClient = new ActivityRecognitionClient(this);
         mIntentService = new Intent(this, DetectedActivitiesIntentService.class);
-        mPendingIntent = PendingIntent.getService(this, 1, mIntentService, PendingIntent.FLAG_UPDATE_CURRENT);
+        //mIntentService = new Intent(this, MyIntentService.class);
+        //mPendingIntent = PendingIntent.getService(this, 1, mIntentService, PendingIntent.FLAG_UPDATE_CURRENT);//一部更新
+        mPendingIntent = PendingIntent.getService(this, 1, mIntentService, PendingIntent.FLAG_CANCEL_CURRENT);//まるっと更新
         requestActivityUpdatesButtonHandler();
     }
 
@@ -60,6 +62,7 @@ public class BackgroundDetectedActivitiesService extends Service {
                 Constants.DETECTION_INTERVAL_IN_MILLISECONDS,
                 mPendingIntent);
 
+
         task.addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void result) {
@@ -69,6 +72,8 @@ public class BackgroundDetectedActivitiesService extends Service {
                         .show();
             }
         });
+
+
 
         task.addOnFailureListener(new OnFailureListener() {
             @Override

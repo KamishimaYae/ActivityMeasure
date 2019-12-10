@@ -3,11 +3,14 @@ package com.example.activity_map;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
 public class MyService extends Service {
+    //private static final String TAG = "LocalService";
+
     public void onCreate() {
         super.onCreate();
     }
@@ -15,6 +18,7 @@ public class MyService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // to do something
+        //return START_STICKY;
         return START_NOT_STICKY;//勝手な再起動を防ぐ
     }
 
@@ -23,9 +27,11 @@ public class MyService extends Service {
         super.onDestroy();
     }//バックグラウンドで動くスレッドを使っている場合、onDestroy()で確実に止めること
 
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
+
 }
 
